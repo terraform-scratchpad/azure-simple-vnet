@@ -2,26 +2,18 @@ provider "azurerm" {
 version = "1.8.0"
 }
 
-#
-# Create resource group de be deleted later on
-#
-resource "azurerm_resource_group" "tf-resource-group" {
-  name      = "${var.resource_group_name}"
-  location  = "${var.location}"
-}
-
 # create the VNet
 resource "azurerm_virtual_network" "network" {
   name                = "network-${count.index}"
-  location            = "${azurerm_resource_group.tf-resource-group.location}"
+  resource_group_name = "${var.resource_group_name}"
+  location            = "${var.location}"
   address_space       = ["${var.network_address_space}"]
-  resource_group_name = "${azurerm_resource_group.tf-resource-group.name}"
 }
 
 # create NSG
 resource "azurerm_network_security_group" "nsg" {
-  resource_group_name           = "${azurerm_resource_group.tf-resource-group.name}"
-  location                      = "${azurerm_resource_group.tf-resource-group.location}"
+  resource_group_name = "${var.resource_group_name}"
+  location            = "${var.location}"
   name                          = "tf-nsg-${count.index}"
 
   security_rule {
@@ -84,7 +76,7 @@ resource "azurerm_network_security_group" "nsg" {
 # create subnets
 resource "azurerm_subnet" "vms-subnet" {
   name = "vms-subnet-${count.index}"
-  resource_group_name = "${azurerm_resource_group.tf-resource-group.name}"
+  resource_group_name = "${var.resource_group_name}"
   address_prefix = "${var.subnet_address_prefix}"
   virtual_network_name = "${azurerm_virtual_network.network.name}"
 }
