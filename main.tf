@@ -1,20 +1,31 @@
 provider "azurerm" {
-version = "1.8.0"
+    version = "1.8.0"
+}
+
+provider "random" {
+  version = "1.3.0"
+}
+
+# generate random username and password
+resource "random_string" "vm-username" {
+  length = 10
+  special = false
 }
 
 # create the VNet
 resource "azurerm_virtual_network" "network" {
-  name                = "network-${count.index}"
+  name                = "network-${random_string.vm-username.id}"
   resource_group_name = "${var.resource_group_name}"
   location            = "${var.location}"
   address_space       = ["${var.network_address_space}"]
+  tags                = "${var.tags}"
 }
 
 # create NSG
 resource "azurerm_network_security_group" "nsg" {
   resource_group_name = "${var.resource_group_name}"
   location            = "${var.location}"
-  name                          = "tf-nsg-${count.index}"
+  name                          = "tf-nsg-${random_string.vm-username.id}"
 
   security_rule {
     name                       = "ssh"
@@ -71,13 +82,16 @@ resource "azurerm_network_security_group" "nsg" {
     source_address_prefix      = "*"
     destination_address_prefix = "*"
   }
+
+  tags                          = "${var.tags}"
 }
 
 # create subnets
 resource "azurerm_subnet" "vms-subnet" {
-  name = "vms-subnet-${count.index}"
-  resource_group_name = "${var.resource_group_name}"
-  address_prefix = "${var.subnet_address_prefix}"
-  virtual_network_name = "${azurerm_virtual_network.network.name}"
+  name                  = "vms-subnet-${random_string.vm-username.id}"
+  resource_group_name   = "${var.resource_group_name}"
+  address_prefix        = "${var.subnet_address_prefix}"
+  virtual_network_name  = "${azurerm_virtual_network.network.name}"
+  tags                  = "${var.tags}"
 }
 

@@ -13,3 +13,7 @@ variable subnet_address_prefix {
 variable network_address_space {
   description = "virtual network address space : 10.0.0.0/16"
 }
+
+variable "tags" {
+  description = "tags"
+}
