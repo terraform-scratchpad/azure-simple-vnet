@@ -15,5 +15,6 @@ variable network_address_space {
 }
 
 variable "tags" {
+  type = "map"
   description = "tags"
 }
