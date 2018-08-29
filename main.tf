@@ -3,7 +3,7 @@ provider "azurerm" {
 }
 
 provider "random" {
-  version = "1.3.0"
+  version = "~> 1.3.0"
 }
 
 # generate random username and password
